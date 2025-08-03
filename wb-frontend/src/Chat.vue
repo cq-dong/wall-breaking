@@ -23,6 +23,7 @@
             <textarea v-model="userInput" type="text" placeholder="输入您的消息..." class="chat-input" required></textarea>
             <button type="submit" class="send-button">发送</button>
           </form>
+          <VoiceRecorder @finish-record="handleRecordFinish"/>
         </div>
       </div>
     </div>
@@ -53,6 +54,7 @@
 <script setup>
 import { ref, nextTick } from 'vue';
 import ChatMessage from './components/ChatMessage.vue';
+import VoiceRecorder from './components/VoiceRecorder.vue';
 import { Marked } from 'marked';
 import { markedHighlight } from "marked-highlight";
 import hljs from 'highlight.js';
@@ -88,14 +90,21 @@ if (!userName) {
   localStorage.setItem('username', userName);
 }
 let chat_ws = null;
+const audioBase64String = ref(null);
+const handleRecordFinish = async (base64String) => {
+  audioBase64String.value = base64String;
+  await sendMessage();
+};
 
 const sendMessage = async () => {
   // let username = localStorage.getItem('username');
-  if (!userInput.value.trim()) return;
+  if (!userInput.value.trim() && !audioBase64String.value) return;
 
   // Add user message to chat
-  messages.value.push({ text: userInput.value, isUser: true, timestamp: String(Date.now()) });
-
+  messages.value.push({ text: userInput.value, isUser: true, 
+    timestamp: String(Date.now()), 
+    audio_base64: audioBase64String.value });
+  audioBase64String.value= null;
   // Clear input
   var userInputValue = userInput.value;
   userInput.value = '';
@@ -309,7 +318,8 @@ const uploadImage = async () => {
 }
 
 .chat-history {
-  flex: 0 0 10%;
+  flex: 0 0 25%;
+  max-width: 10cm;
   overflow-y: auto;
   border: 1px solid #e4e4e4;
   border-radius: 4px;
@@ -333,7 +343,6 @@ const uploadImage = async () => {
   border-radius: 4px;
   transition: all 0.2s ease;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  height: 30px;
   align-items: center;
   overflow: hidden;
   white-space: nowrap;

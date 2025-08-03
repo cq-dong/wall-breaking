@@ -1,14 +1,12 @@
 <template>
-  <div :class="['message', message.isUser ? 'user-message' : 'bot-message']" v-html="parsedMessage">
-  </div>
-
-  <!-- 语音条 -->
-  <div v-if="message.audio_file" class="audio-player">
-    <button @click="togglePlayback" class="audio-button">
-      <span v-if="!isPlaying">▶</span>
-      <span v-else>⏸</span>
-    </button>
-    <span class="audio-label">点击播放语音</span>
+  <div :class="['message', message.isUser ? 'user-message' : 'bot-message']">
+    <div v-if="message.text" v-html="parsedMessage"></div>
+    <div v-if="message.audio_base64">
+      <audio controls>
+        <source :src="audioUrl">
+        </source>
+      </audio>
+    </div>
   </div>
 </template>
 
@@ -36,29 +34,14 @@ const props = defineProps({
   }
 });
 
-const isPlaying = ref(false);
-const audioElement = ref(null);
+const audioUrl = computed(() => {
+  return props.message.audio_base64;
+});
 
 const parsedMessage = computed(() => {
   return marked.parse(props.message.text);
 });
 
-const togglePlayback = () => {
-  if (!audioElement.value) {
-    audioElement.value = new Audio(props.message.audioUrl);
-    audioElement.value.onended = () => {
-      isPlaying.value = false;
-    };
-  }
-
-  if (isPlaying.value) {
-    audioElement.value.pause();
-    isPlaying.value = false;
-  } else {
-    audioElement.value.play();
-    isPlaying.value = true;
-  }
-};
 </script>
 
 <style scoped>
@@ -82,20 +65,6 @@ const togglePlayback = () => {
 .audio-player {
   display: flex;
   align-items: center;
-  margin-top: 10px;
-  padding: 8px 12px;
-  background-color: #f0f0f0;
-  border-radius: 18px;
-  max-width: 50%;
-}
-
-.user-message .audio-player {
-  align-self: flex-end;
-  margin-left: auto;
-}
-
-.bot-message .audio-player {
-  align-self: flex-start;
 }
 
 .audio-button {
