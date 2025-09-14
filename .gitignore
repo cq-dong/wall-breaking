@@ -21,3 +21,33 @@
 .ionide
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode
+
+# 环境变量文件
+.env
+env
+*.env
+!.env.example
+
+# API密钥和配置文件
+config.json
+secrets.json
+
+# 用户数据
+wb-backend/userData/
+
+# 依赖和构建文件
+node_modules/
+dist/
+build/
+*.log
+*.tmp
+
+# IDE文件
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 操作系统文件
+.DS_Store
+Thumbs.db

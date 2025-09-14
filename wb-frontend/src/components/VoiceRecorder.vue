@@ -88,19 +88,20 @@ onMounted(() => {
 }
 
 #buttons button {
-  font-size: 1rem;
-  padding: 1rem;
+  font-size: 0.6rem;
+  padding: 0.4rem;
   width: calc(50% - 0.25rem);
 }
 
 button {
-  font-size: 1rem;
+  font-size: 0.6rem;
   background: #0088cc;
   text-align: center;
   color: white;
   border: none;
   transition: all 0.2s;
-  padding: 0.5rem;
+  padding: 0.3rem;
+  border-radius: 24px;
 }
 
 button:hover,

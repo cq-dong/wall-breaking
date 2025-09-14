@@ -55,6 +55,10 @@ class LLMTextClient:
         "qwen-omni-turbo": {
             "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
             "api_key_env": "DASHSCOPE_API_KEY"
+        },
+        "qwen-vl-max-latest": {
+            "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+            "api_key_env": "DASHSCOPE_API_KEY"
         }
         # 示例：未来可添加 OpenAI 模型
         # "gpt-4": {
@@ -93,7 +97,7 @@ class LLMTextClient:
 
         self.client = OpenAI(api_key=self.api_key, base_url=self.base_url)
 
-    def _format_messages(self, history: List[Dict[str, Any]]) -> List[Dict[str, str]]:
+    def _format_messages(self, history: List[Dict[str, Any]], system_prompt: Optional[str] = None) -> List[Dict[str, str]]:
         """
         将用户输入的历史消息转换为标准 OpenAI 格式，并插入系统消息。
         """
@@ -104,30 +108,61 @@ class LLMTextClient:
         # ]
 
         for msg in history:
-            if msg["text"] != "":
-                messages.append({
-                    "role": "user" if msg["isUser"] else "assistant", "content": msg["text"]
+            role = "user" if msg["isUser"] else "assistant"
+            
+            # 处理包含图像的消息
+            if msg.get("image_base64") and msg.get("image_type"):
+                content = []
+                
+                # 添加图像内容
+                image_format = msg["image_type"].split('/')[-1]  # 从 'image/png' 提取 'png'
+                content.append({
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:{msg['image_type']};base64,{msg['image_base64']}"
+                    }
                 })
-            else:
+                
+                # 如果有文本，也添加文本内容
+                if msg.get("text"):
+                    content.append({
+                        "type": "text",
+                        "text": msg["text"]
+                    })
+                
                 messages.append({
-                    "role": "user" if msg["isUser"] else "assistant", "content": [{"type":"input_audio",
-                                                                                   "input_audio":
-                                                                                    {"data": msg["audio_base64"]}}]
+                    "role": role,
+                    "content": content
+                })
+            # 处理纯文本消息
+            elif msg.get("text"):
+                messages.append({
+                    "role": role,
+                    "content": msg["text"]
+                })
+            # 处理音频消息
+            elif msg.get("audio_base64"):
+                messages.append({
+                    "role": role,
+                    "content": [{"type": "input_audio",
+                                "input_audio": {"data": msg["audio_base64"]}}]
                 })
 
 
-        # 插入系统消息在最前面
-        messages.insert(0, {"role": "system", "content": self.system_message})
+        # 插入系统消息在最前面，优先使用传入的system_prompt
+        system_message = system_prompt if system_prompt is not None else self.system_message
+        messages.insert(0, {"role": "system", "content": system_message})
         return messages
 
-    def generate(self, messages: List[Dict[str, Any]]) -> str:
+    def generate(self, messages: List[Dict[str, Any]], system_prompt: Optional[str] = None) -> str:
         """
         非流式生成响应。
 
         :param messages: 对话历史，格式为 [{"isUser": bool, "text": str}, ...]
+        :param system_prompt: 可选的系统提示词，如果提供则覆盖默认的system_message
         :return: 模型回复文本
         """
-        formatted_msgs = self._format_messages(messages)
+        formatted_msgs = self._format_messages(messages, system_prompt)
         completion = self.client.chat.completions.create(
             model=self.model,
             messages=formatted_msgs,
@@ -136,14 +171,15 @@ class LLMTextClient:
         )
         return completion.choices[0].message.content
 
-    def stream(self, messages: List[Dict[str, Any]]) -> Iterator:
+    def stream(self, messages: List[Dict[str, Any]], system_prompt: Optional[str] = None) -> Iterator:
         """
         流式生成响应。
 
         :param messages: 对话历史，格式为 [{"isUser": bool, "text": str}, ...]
+        :param system_prompt: 可选的系统提示词，如果提供则覆盖默认的system_message
         :return: 生成器，返回 chunk 流
         """
-        formatted_msgs = self._format_messages(messages)
+        formatted_msgs = self._format_messages(messages, system_prompt)
         return self.client.chat.completions.create(
             model=self.model,
             messages=formatted_msgs,

@@ -1,19 +1,91 @@
-# WallBreaking 安装指南
+# Wall Breaking - AI聊天应用
 
-本项目为前后端分离项目，前端使用 Vue 3 编写，后端使用 FastAPI 完成。
+一个基于Vue 3和FastAPI的AI聊天应用，支持文本对话、图像生成和语音交互。
 
-使用前，请现将阿里云百炼 Key 放置于环境变量参数 `DASHSCOPE_API_KEY` 中，以便程序自动读取。
+## 功能特性
 
-## 后端环境配置指南
+- 🤖 AI文本对话（基于通义千问）
+- 🎨 AI图像生成（阿里云百炼）
+- 🎵 语音交互
+- 📷 图片上传和处理
+- 🎭 角色扮演（雷电将军）
+- 🖼️ 自定义聊天背景
 
-后端所需所有 conda 依赖保存在 requirements.txt 文件中，请依照该文件开头所述的 conda 环境安装提示进行安装。
+## 技术栈
 
-安装完成后，可以使用 `fastapi.exe dev main.py` 命令运行 wb-backend 文件夹下的 main.py 文件，以启动后端服务。
+### 前端
+- Vue 3
+- Vite
+- JavaScript
 
-## 前端配置指南
+### 后端
+- FastAPI
+- Python
+- WebSocket
+- 阿里云百炼API
 
-请安装 nodejs ，并在 wb-frontend 目录下执行 `npm install` 命令。安装完成后在 wb-frontend 目录下执行 
-`npm run dev` 命令启动前端服务。
+## 安装和运行
 
-至此，前后端服务均启动，可以正常对话。
+### 环境要求
+- Node.js 16+
+- Python 3.8+
+- 阿里云百炼API密钥
+
+### 后端设置
+
+1. 进入后端目录：
+```bash
+cd wb-backend
+```
+
+2. 安装依赖：
+```bash
+pip install -r requirements.txt
+```
+
+3. 设置环境变量：
+```bash
+# 创建.env文件并添加你的API密钥
+echo "DASHSCOPE_API_KEY=your_api_key_here" > .env
+```
+
+4. 启动后端服务：
+```bash
+python main.py
+```
+
+### 前端设置
+
+1. 进入前端目录：
+```bash
+cd wb-frontend
+```
+
+2. 安装依赖：
+```bash
+npm install
+```
+
+3. 启动开发服务器：
+```bash
+npm run dev
+```
+
+## 使用说明
+
+1. 启动后端和前端服务
+2. 访问 http://localhost:5173（或显示的端口）
+3. 开始与AI对话
+4. 使用🎨按钮生成图像
+5. 使用📷按钮上传图片
+
+## 注意事项
+
+- 请确保已设置有效的阿里云百炼API密钥
+- 图像生成功能需要网络连接
+- 建议在生产环境中使用HTTPS
+
+## 许可证
+
+MIT License
 
