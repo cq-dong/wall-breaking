@@ -52,8 +52,6 @@ async def chat(user_id: str, history_id: str):
 async def save_chat(user_id: str, history_id: str, chat_data: dataModel.ChatData):
     """保存对话数据"""
     try:
-        chatdb = dataModel.ChatHistoryJsonDB(user_id)
-        chatdb.add_history(history_id, chat_data.messages)
         return {"success": True, "message": "对话保存成功"}
     except Exception as e:
         return {"success": False, "message": f"保存失败: {str(e)}"}

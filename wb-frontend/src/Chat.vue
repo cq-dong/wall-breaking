@@ -870,6 +870,7 @@ const selectHistory = async (historyId) => {
 
 const newChat = async () => {
   // 如果当前有消息，先保存当前对话
+  /* 无需保存当前对话，每次对话均会自动保存数据
   if (messages.value.length > 0) {
     try {
       // 发送当前对话数据到后端保存
@@ -888,7 +889,7 @@ const newChat = async () => {
       console.error('Error saving current chat:', error);
     }
   }
-  
+  */
   // 创建新对话
   chatId.value = String(Date.now());
   messages.value = [];
