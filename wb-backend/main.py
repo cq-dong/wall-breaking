@@ -153,7 +153,7 @@ async def image_generation(request: dict):
             model="qwen-image",
             prompt=prompt,
             n=1,
-            size='1024*1024',
+            size='1328*1328',  # 可用图片大小为 1664*928,1472*1140,1328*1328,1140*1472,928*1664.
             prompt_extend=True,
             watermark=False
         )
